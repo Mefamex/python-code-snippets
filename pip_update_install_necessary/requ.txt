@@ -1,0 +1,4 @@
+
+fsnotify
+wxpython
+whois
