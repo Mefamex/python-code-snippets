@@ -1,7 +1,7 @@
 # Python Code Snippets
 
 > *author*: [Mefamex](https://github.com/Mefamex) <br>
-> *last_modify: 2025-07-20*
+> *last_modify: 2025-07-22*
 
 
 Geliştirme sürecinde ihtiyaç duyduğum Python araçlarını ve kod parçalarını bir arada tutmak için oluşturduğum koleksiyon. Bu repository büyük bir framework değil, pratik çözümler sunan bağımsız araçların derlemesidir.
@@ -17,42 +17,32 @@ Her araç kendi başına çalışır ve farklı geliştirme ihtiyaçlarına yan�
 
 
 
-<br>
-
-## İçindekiler
-
-- [check_file_dependencies](check_file_dependencies/)
-  - [`check_file_dependencies.py`](check_file_dependencies/check_file_dependencies.py)
-  - [`README.md`](check_file_dependencies/README.md)
-
-- [directory_explorer](directory_explorer/)
-  - [`directory_explorer.py`](directory_explorer/directory_explorer.py)
-  - [`README.md`](directory_explorer/README.md)
-
-- [multiThread](multiThread/)
-  - [`threadpool.py`](multiThread/threadpool.py)
-  - [`README.md`](multiThread/README.md)
-
-- [web_FileTreeCreator](web_FileTreeCreator/)
-  - [`FileTreeCreator.py`](web_FileTreeCreator/FileTreeCreator.py)
-  - [`README.md`](web_FileTreeCreator/README.md)
-
-- [web_LinkTreeCreator](web_LinkTreeCreator/)
-  - [`LinkTreeCreator.py`](web_LinkTreeCreator/LinkTreeCreator.py)
-  - [`README.md`](web_LinkTreeCreator/README.md)
+<br><br>
 
 
-<br>
+
+<h2 align="center" id="İçindekiler">İçindekiler</h2>
+
+### [python_docstring_format](PYTHON_DOCSTRING_example.md) 
+- Python projelerinde fonksiyon, sınıf ve modüller için standart docstring şablonu 
+
+### [check_file_dependencies](check_file_dependencies/README.md) 
+- Python modül bağımlılıklarını kontrol eden ve eksik olanları yükleyen araç
+
+### [directory_explorer](directory_explorer/README.md)
+- Dizin yapısını özyinelemeli olarak tarayan, boyutları hesaplayan ve JSON/TXT formatında dışa aktaran araç
+
+### [multiThread](multiThread/README.md)
+- Paralel görev yürütümü için thread pool implementasyonu
+
+### [web_FileTreeCreator](web_FileTreeCreator/README.md)
+- Web sitesi dosya ağacı oluşturmak için dizinleri tarayan ve JSON çıktısı üreten araç
+
+### [web_LinkTreeCreator](web_LinkTreeCreator/README.md)
+- Web sitesi navigasyonu için HTML dosyalarını tarayarak link ağacı oluşturan araç
 
 
-## Projeler
+<br><hr><br>
 
-**check_file_dependencies:** Python projelerinde modül bağımlılıklarını otomatik kontrol eden, eksik olanları yükleyen araç . [incele](check_file_dependencies/README.md)
 
-**directory_explorer:** Dizin yapısını özyinelemeli olarak tarayan, boyutları hesaplayan ve JSON/TXT formatında dışa aktaran araç . [incele](directory_explorer/README.md)
 
-**multiThread:** Paralel görev yürütümü için thread pool implementasyonu . [incele](multiThread/README.md)
-
-**web_FileTreeCreator:** Web sitesi dosya ağacı oluşturmak için dizinleri tarayan ve JSON çıktısı üreten araç . [incele](web_FileTreeCreator/README.md)
-
-**web_LinkTreeCreator:** Web sitesi navigasyonu için HTML dosyalarını tarayarak link ağacı oluşturan araç . [incele](web_LinkTreeCreator/README.md)
