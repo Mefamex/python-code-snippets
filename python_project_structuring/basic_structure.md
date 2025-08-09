@@ -18,14 +18,14 @@ Taşınabilir, sanal ortam ile, bilgisayarınızdaki diğer Python projelerinden
 
 ## CREATE PYTHON PROJECT BASE
 
-- `uv` : kullanıcaktım ama çok eksiği var...
 
 - `venv` modülü ile sanal ortam oluşturun.
 
 ``` bash
 :: UPDATE : python packages
 python -m pip install -U pip
-python -m pip install -U wheel setuptools venv-py
+python -m pip install -U wheel setuptools PyInstaller 
+
 
 
 :: CREATE PYTHON: Project Directory
@@ -42,10 +42,10 @@ call .venv\Scripts\activate
 
 
 :: INSTALL BASE 
-python.exe -m pip install -U pip venv-py
+python.exe -m pip install -U pip
 python.exe -m pip freeze > requirements.txt
 ECHO # -*- coding: utf-8 -*- >> main.py
-python -c "import datetime;print('# Created on: '+datetime.datetime.now().isoformat(timespec='seconds')+'Z')" >> main.py
+python -c "import datetime; print('# Created on: '+datetime.datetime.now().isoformat(timespec='seconds')+'Z')" >> main.py
 ```
 
 
@@ -146,6 +146,5 @@ python -m venv .venv
 call .venv\Scripts\activate
 
 :: 4. Tüm bağımlılıkları uv.lock dosyasına göre senkronize edin
-python -m pip install -U -r requirements.txt
+python -m pip install -r requirements.txt
 ```
-

@@ -1,11 +1,12 @@
 :: UPDATE : python packages
 python -m pip install -U pip
-python -m pip install -U wheel setuptools venv-py
+python -m pip install -U wheel setuptools PyInstaller 
+
 
 
 :: CREATE PYTHON: Project Directory
-mkdir my_project
-cd my_project
+mkdir [project_name]
+cd [project_name]
 
 
 :: UV-VENV : Create a Virtual Environment
@@ -17,10 +18,10 @@ call .venv\Scripts\activate
 
 
 :: INSTALL BASE 
-python.exe -m pip install -U pip venv-py
+python.exe -m pip install -U pip
 python.exe -m pip freeze > requirements.txt
 ECHO # -*- coding: utf-8 -*- >> main.py
-python -c "import datetime;print('# Created on: '+datetime.datetime.now().isoformat(timespec='seconds')+'Z')" >> main.py
+python -c "import datetime; print('# Created on: '+datetime.datetime.now().isoformat(timespec='seconds')+'Z')" >> main.py
 
 
 
@@ -28,9 +29,7 @@ python -c "import datetime;print('# Created on: '+datetime.datetime.now().isofor
 
 
 
-
-
-
+:: INITIALIZE FILES
 ECHO. >> main.py
 ECHO def main(): >> main.py
 ECHO     print("Hello, World!") >> main.py
@@ -38,8 +37,9 @@ ECHO. >> main.py
 ECHO if __name__ == "__main__": >> main.py
 ECHO     main() >> main.py
 ECHO. >> main.py
+
 ECHO .venv\Scripts\activate >> _activate
-# README.md with # [folder_name] but folder name automatically
+
 for %%i in (.) do set "folder_name=%%~nxi"
 ECHO # %folder_name% >> README.md
 ECHO. >> README.md
@@ -62,6 +62,5 @@ ECHO ## Project Structure: >> README.md
 ECHO. >> README.md
 ECHO. >> README.md
 
-mkdir src\utils
-mkdir src\tests
-mkdir src\assets
+ECHO.
+ECHO Project %folder_name% created successfully!
