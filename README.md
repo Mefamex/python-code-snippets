@@ -1,7 +1,7 @@
 # Python Code Snippets
 
 > *author*: [Mefamex](https://github.com/Mefamex) <br>
-> *last_modify: 2025-07-22*
+> *last_modify: 2025-08-10*
 
 
 Geliştirme sürecinde ihtiyaç duyduğum Python araçlarını ve kod parçalarını bir arada tutmak için oluşturduğum koleksiyon. Bu repository büyük bir framework değil, pratik çözümler sunan bağımsız araçların derlemesidir.
@@ -22,6 +22,9 @@ Her araç kendi başına çalışır ve farklı geliştirme ihtiyaçlarına yan�
 
 
 <h2 align="center" id="İçindekiler">İçindekiler</h2>
+
+### [python_project_structuring](python_project_structuring/README.md)
+- Python projeleri için önerilen dizin yapısı ve dosya organizasyonu oluşturma scripti.
 
 ### [python_docstring_format](PYTHON_DOCSTRING_example.md) 
 - Python projelerinde fonksiyon, sınıf ve modüller için standart docstring şablonu 

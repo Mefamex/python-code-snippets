@@ -14,8 +14,8 @@ Bu yapıyı kendi projenize uyarlayabilirsiniz.
 <hr><br><br>
 
 ```python 
-#!/usr/bin/env python3 
 # -*- coding: utf-8 -*- 
+#!/usr/bin/env python3 
 
 """
 ===========================================================
