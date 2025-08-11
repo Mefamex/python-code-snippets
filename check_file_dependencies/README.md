@@ -11,6 +11,7 @@ Proje geliştirme sürecinde bağımlılık yönetimini otomatikleştirmek için
 <br>
 
 
+
 ## Özellikler
 - Tek veya çoklu modül bağımlılık kontrolü
 - Eksik modüllerin otomatik yüklenmesi
