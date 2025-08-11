@@ -30,7 +30,7 @@ import cv2
 
 DEF_CODEC : str = 'mp4v'
 DEF_FPS   : float = 30.0
-DEF_HEIGHT: int = 720
+DEF_HEIGHT: int = 1080
 
 class Resize:
     def __init__(self, input_file, height: int = DEF_HEIGHT, fps: float = DEF_FPS, codec: str = DEF_CODEC):
@@ -99,7 +99,7 @@ class Resize:
                     boyut = None
                     try: boyut = self.output_file.stat().st_size/(1024*1024)
                     except: pass
-                    print(f'\rİlerleme: {(frame_idx/total_frames)*100:.2f}% - Bozuk frame: {corrupted_frames}  |  '+ f'{boyut:.2f} MB' if boyut else "", end="")
+                    print(f'\rİlerleme: {(frame_idx/total_frames)*100:.2f}% - Bozuk frame: {corrupted_frames}  |  '+ f'{boyut:.2f} MB' if boyut else "", end="", flush=True)
                 ret, frame = self.clip.read()
                 if not ret: break 
                 # Frame Kontrolü

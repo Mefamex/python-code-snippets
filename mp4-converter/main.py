@@ -181,13 +181,13 @@ def flat_dict(d:dict, title=""):
 ############### resize CLASS  ####################
 DEF_CODEC : str = 'mp4v'
 DEF_FPS   : float = 30.0
-DEF_HEIGHT: int = 720
+DEF_HEIGHT: int = 1080
 
 
 def get_user_input():
     """Kullanıcıdan video dönüştürme parametrelerini al"""
     for q in bilgilendirme.split("\n"):
-        print(q)
+        print(q,flush=True )
         sleep(0.03)
     sleep(1)
     print("\n" + "="*50 + "🎬 VIDEO DÖNÜŞTÜRÜCÜ"+ "="*50+ "\n\n")

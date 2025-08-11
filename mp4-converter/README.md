@@ -8,9 +8,7 @@ Tek dosya veya klasör işleme, bozuk frame koruması, gerçek zamanlı ilerleme
 
 > *last_modify: 2025-08-11*
 
-
-
-<br>
+<br><br>
 
 
 
@@ -26,9 +24,19 @@ Tek dosya veya klasör işleme, bozuk frame koruması, gerçek zamanlı ilerleme
 - **Akıllı Filtreleme:** Bozuk frame'leri tespit etme ve düzeltme
 - **Çoklu Platform:** Windows, Linux, macOS desteği
 
+<div align='center'><img src="./ss/pic-3.png" alt="Video Resizer Tool" width="400"></div>
+
+## 📥 Download
+
+**Windows (.exe):**
+  - 📺 [VideoResizer-mfmx-720p.exe](./ss/VideoResizer-mfmx-720p.exe) - *HD Sürüm*
+  - 🎬 [VideoResizer-mfmx-1080p.exe](./ss/VideoResizer-mfmx-1080p.exe) - *Full HD Sürüm*
+
+> 💡 **Not:** EXE dosyaları **Python gerektirmez** ve `doğrudan çalıştırılabilir`. 
 
 
-<br>
+
+<br><br>
 
 
 
@@ -42,7 +50,7 @@ Tek dosya veya klasör işleme, bozuk frame koruması, gerçek zamanlı ilerleme
 
 
 
-<br>
+<br><br><br>
 
 
 
@@ -76,7 +84,7 @@ toExe.bat             # Windows için çift tıklayın
 
 
 
-<br>
+<br><br><br>
 
 
 
@@ -97,16 +105,16 @@ python main.py ./videos/
 ### Parametreli Kullanım
 ```bash
 # Boyut değiştirme
-python main.py video.mp4 -y 1080          # 1080p'ye dönüştür
-python main.py video.mp4 -y 480           # 480p'ye dönüştür
+python main.py video.mp4 -y 1080    # 1080p'ye dönüştür
+python main.py video.mp4 -y 480      # 480p'ye dönüştür
 
 # FPS ayarlama
-python main.py video.mp4 -f 24            # 24fps'e düşür
-python main.py video.mp4 -f 60            # 60fps'e yükselt
+python main.py video.mp4 -f 24      # 24fps'e düşür
+python main.py video.mp4 -f 60      # 60fps'e yükselt
 
 # Codec seçimi
-python main.py video.mp4 -c H264          # H264 codec kullan
-python main.py video.mp4 -c XVID          # XVID codec kullan
+python main.py video.mp4 -c H264    # H264 codec kullan
+python main.py video.mp4 -c XVID     # XVID codec kullan
 
 # Kombine kullanım
 python main.py video.mp4 -y 720 -f 30 -c mp4v
@@ -131,7 +139,7 @@ VideoResizer.exe --help-me
 
 
 
-<br>
+<br><br><br>
 
 
 
@@ -238,7 +246,7 @@ QUALITY_PRESETS = {
 
 
 
-<br>
+<br><br><br>
 
 
 
@@ -263,7 +271,7 @@ EXCLUDE_FILES = [".DS_Store", "*.tmp", "*.log"]
 
 
 
-<br>
+<br><br><br>
 
 
 
@@ -314,7 +322,7 @@ python main.py .\videos\video.mp4
 
 
 
-<br>
+<br><br><br>
 
 
 
@@ -347,7 +355,7 @@ pyinstaller --onefile --console --name VideoResizer main.py
 
 
 
-<br>
+<br><br><br>
 
 
 
@@ -367,7 +375,7 @@ video-resizer-tool/
 
 
 
-<br>
+<br><br><br>
 
 
 
@@ -402,7 +410,7 @@ python main.py "C:\Users\Username\Videos" -y 1080 -f 30
 
 
 
-<br>
+<br><br><br>
 
 
 
@@ -415,6 +423,8 @@ python main.py "C:\Users\Username\Videos" -y 1080 -f 30
 - **RAM:** 16GB DDR4
 - **Video:** 1080p 30fps H264 (100MB)
 
+<br>
+
 ### İşlem Süreleri
 | Hedef | Codec | Süre | Çıktı Boyutu |
 | ----- | ----- | ---- | ------------ |
@@ -422,6 +432,52 @@ python main.py "C:\Users\Username\Videos" -y 1080 -f 30
 | 720p  | H264  | 78s  | 58MB         |
 | 480p  | XVID  | 32s  | 38MB         |
 | 1080p | HEVC  | 125s | 45MB         |
+
+<br><br>
+
+### Gerçek Dönüştürme Sonuçları
+
+#### 720p H264 Dönüştürme Örneği
+```
+🎬 video dosyası: test_video.mp4
+📏 boyut : 1440.0 x 2558.0 px
+📐 height : 720p ← 1440.0 x 2558.0 px
+🎞️ fps : 30.0 ← 30.0
+🔧 codec : h264
+
+========================================
+DÖNÜŞÜM TAMAMLANDI
+Başarılı frame'ler: 1175
+Bozuk frame'ler: 0
+Başarı oranı: %100.0
+💾 71.29 MB → 3.20 MB | -95.52%
+========================================
+```
+
+<div align='center'><img src="./ss/pic-1.png" alt="FFmpeg Logo" width="400px"/></div>
+
+<br>
+
+#### 1080p H264 Dönüştürme Örneği  
+```
+🎬 video dosyası: test_video.mp4
+📏 boyut : 1440.0 x 2558.0 px  
+📐 height : 1080p ← 1440.0 x 2558.0 px
+🎞️ fps : 30.0 ← 30.0
+🔧 codec : h264
+
+========================================
+DÖNÜŞÜM TAMAMLANDI
+Başarılı frame'ler: 1175
+Bozuk frame'ler: 0
+Başarı oranı: %100.0
+💾 71.29 MB → 22.99 MB | -67.76%
+========================================
+```
+<div align='center'><img src="./ss/pic-2.png" alt="FFmpeg Logo" width="400px"/></div>
+
+
+> **Sıkıştırma Performansı:** 720p dönüştürme %95.52 oranında boyut azaltması sağlarken, 1080p dönüştürme %67.76 oranında azaltma sağlamaktadır. Her iki durumda da %100 başarı oranı ile bozuk frame kaybı yaşanmamıştır.
 
 
 

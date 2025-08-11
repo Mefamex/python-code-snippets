@@ -46,9 +46,10 @@ echo.
 REM Virtual environment kontrolü
 echo [2/10] Virtual environment kontrol ediliyor...
 if exist ".venv\" (
-    echo ✅ Virtual environment bulundu (.venv^)
     call .venv\Scripts\activate.bat >nul 2>&1
     echo Virtual environment aktif edildi
+    python.exe -m pip -V 
+    echo ✅ Virtual environment bulundu (.venv^)
 ) else (
     echo ⚠️  Virtual environment bulunamadi
     echo Sistem Python kullanilacak
@@ -288,13 +289,15 @@ if exist "dist\VideoResizer.exe" (
     echo   VideoResizer.exe video.mp4 -y 1080 -f 30
     echo   VideoResizer.exe --help
     echo.
-
-) else (
-    echo ❌ HATA: VideoResizer.exe olusturulamadi!
-    echo dist klasorunu kontrol edin
 )
 
-echo.
+REM Eğer EXE oluşturulamadıysa hata mesajı göster
+if not exist "dist\VideoResizer.exe" (
+    echo ❌ HATA: VideoResizer.exe olusturulamadi!
+    echo dist klasorunu kontrol edin
+    echo.
+)
+
 echo Temizlik yapiliyor...
 if exist "build\" rmdir /s /q "build"
 if exist "*.spec" del /q "*.spec"
