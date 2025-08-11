@@ -48,9 +48,10 @@ Classes:
     - VersionComparisonError: Sürüm karşılaştırma hatası
 
 Main Methods:
-    - ensure_module(module_name, auto_update, verbose, time_out): Tek modül kontrolü
-    - check_multiple_modules(modules_list, auto_update, verbose, timeout): Çoklu modül kontrolü (detaylı sonuç)
-    - check_multiple_modules_bool(modules_list, auto_update, verbose, timeout): Çoklu modül kontrolü (boolean sonuç)
+    - check_requirements_txt( requirements_file: str, ... ): requirements.txt dosyasını kontrol et
+    - ensure_module(module_name, ...): Tek modül kontrolü
+    - check_multiple_modules(modules_list, ...): Çoklu modül kontrolü (detaylı sonuç)
+    - check_multiple_modules_bool(modules_list, ... ): Çoklu modül kontrolü (boolean sonuç)
     - get_modules_status(modules_list, verbose): Modül durum bilgisi alma (yükleme yapmadan)
     - get_installed_version(module_name): Yüklü modül sürümünü getir
     - is_version_compatible(current_version, required_version): Sürüm uyumluluğu kontrolü
@@ -108,20 +109,20 @@ License:
 Changelog:
     - 1.0.0 (2025-07-19): First stable release
     - 1.0.1 (2025-08-07): Major update with new features:
-        * Added get_modules_status() method
-        * Added check_multiple_modules_bool() method
-        * Added pip_name|import_name syntax support
-        * Added PyPI newer version checking
-        * Added packaging library integration
-        * Improved error handling and exception management
-        * Added comprehensive test suite
-        * Added detailed usage examples
-        * Enhanced version comparison with SpecifierSet
-        * Added module update functionality
-        * Improved verbose output formatting
-        * Added timeout management for all operations
+        * Çoklu modül ve sürüm kontrolü geliştirildi
+        * pip_name|import_name desteği eklendi
+        * PyPI güncel sürüm kontrolü ve packaging entegrasyonu
+        * Hata yönetimi ve verbose çıktı iyileştirildi
+        * Kapsamlı test ve kullanım örnekleri eklendi
+        * Timeout yönetimi eklendi
+    - 1.0.2 (2025-08-11):
+        * requirements.txt toplu kontrol ve CLI desteği
+        * Modül yükleme/güncellemede sürüm zorunluluğu desteği
+        * Sonsuz döngü ve tekrar kurulum hataları düzeltildi
+        * Çıktı hizalama ve özet raporlar geliştirildi
+        * Küçük hata düzeltmeleri ve performans iyileştirmeleri
 
-Contributors: None
+Contributors: mefamex
 
 Contact:
     - Email: info@mefamex.com
@@ -141,12 +142,9 @@ Additional Information:
     - ~=: Uyumlu sürüm
     
     Yeni özellikler:
-    - Farklı pip/import ismi desteği: "Pillow|PIL>=8.0.0"
-    - Modül durum sorgulama: get_modules_status()
-    - Boolean sonuç alma: check_multiple_modules_bool()
-    - PyPI güncel sürüm kontrolü: check_module_newer_version()
-    - Gelişmiş hata yönetimi ve özel exception'lar
-    - Kapsamlı test suite ve usage examples
+    - Gelişmiş modül durumu kontrolü
+    - Daha iyi hata mesajları ve istisna yönetimi
+    - Kullanıcı dostu CLI arayüzü
 
 Notes:
     - Modül yükleme işlemleri pip üzerinden yapılır
@@ -173,7 +171,7 @@ Disclaimer and Legal Notice:
 
 """
 
-__version__ = "1.0.1"
+__version__ = "1.0.2"
 __author__ = "Mefamex"
 __email__ = "info@mefamex.com"
 __license__ = "MIT"
@@ -192,7 +190,7 @@ __dependencies__ = {
     "sys": "built-in", 
     "importlib": "built-in",
     "re": "built-in",
-    "warnings": "built-in",
+    "argparse": "built-in",
     "typing": "built-in",
     "packaging": "external - auto-install"
 }
@@ -200,7 +198,7 @@ __dependencies__ = {
 
 
 #============================ IMPORTS ==========================================
-import subprocess, sys, importlib, importlib.util, re, warnings
+import os, sys, subprocess, importlib, importlib.util, re, argparse
 from typing import Optional, List, Union, Tuple, Dict, Any
 from packaging.version import Version
 from packaging.specifiers import SpecifierSet
@@ -218,11 +216,30 @@ class CheckFileDependencies:
     # STATIC VARIABLES
     TIMEOUT    : int  = 300
     AUTO_UPDATE: bool = False
-    VERBOSE    : bool = False
+    VERBOSE    : bool = True
     VERBOSE_def: bool = False
     ######################
     @staticmethod
     def print_class_static_vars():print( f" CheckFileDependencies:\n TIMEOUT     : {CheckFileDependencies.TIMEOUT}\n AUTO_UPDATE : {CheckFileDependencies.AUTO_UPDATE}\n VERBOSE     : {CheckFileDependencies.VERBOSE}\n VERBOSE_RUN : {CheckFileDependencies.VERBOSE_def}")
+
+
+    @staticmethod
+    def check_requirements_txt(requirements_path: str = "requirements.txt", auto_update: bool = False, verbose: bool = False, timeout: int = 300) -> dict:
+        """  requirements.txt dosyasındaki tüm bağımlılıkları kontrol eder, eksik veya uyumsuz olanları yükler/günceller.
+        Returns: dict: Her modül için sonuç (True/False/hata mesajı)  """
+        if not os.path.isfile(requirements_path):
+            if verbose: print(f"[REQ] ❌ Dosya bulunamadı: {requirements_path}")
+            raise FileNotFoundError(f"requirements.txt bulunamadı: {requirements_path}")
+        modules = []
+        with open(requirements_path, "r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip().replace(" ", "").replace("\n", ""). replace("\r", ""). replace("\t", ""). replace("\v", "")
+                if not line or line.startswith("#"): continue
+                modules.append(line)
+        if verbose:  print(f"[REQ] 🔍 {requirements_path} içindeki {len(modules)} modül kontrol ediliyor...")
+        results = CheckFileDependencies.check_multiple_modules( modules_list=modules, auto_update=auto_update, verbose=verbose, timeout=timeout )
+        if verbose:  print(f"[REQ] ✅ requirements.txt kontrolü tamamlandı.")
+        return results
 
 
     @staticmethod
@@ -246,11 +263,11 @@ class CheckFileDependencies:
         """ Check multiple modules at once and return a dictionary with results.
             Returns: Dictionary with module names as keys and True/False/error_message as values
             Example:  modules = ["requests", "numpy>=1.20.0", "Pillow|PIL>=8.0.0"] """
-        if CheckFileDependencies.VERBOSE_def:   print(f"check_multiple_modules {modules_list}, auto_update: {auto_update}, verbose: {verbose}, timeout: {timeout}")
+        if CheckFileDependencies.VERBOSE_def:   print(f"\ncheck_multiple_modules {modules_list}, auto_update: {auto_update}, verbose: {verbose}, timeout: {timeout}")
         if not isinstance(modules_list, (list, tuple)):  raise ValueError("modules_list must be a list or tuple")
         if not modules_list: return {} if not verbose else (print("[MODULE] ⚠️  Empty modules list provided") or {})
         results, successful_count, failed_count = {}, 0, 0
-        if verbose: print(f"[MODULE] 🔍 Checking {len(modules_list)} modules...\n"+"=" * 60)
+        if verbose: print(f"\n[MODULE] 🔍 Checking {len(modules_list)} modules...\n"+"=" * 60)
         for i, module_name in enumerate(modules_list, 1):
             if not isinstance(module_name, str) or not module_name.strip():
                 error_msg = f"Invalid module name at index {i-1}: must be non-empty string"
@@ -262,12 +279,9 @@ class CheckFileDependencies:
             if verbose:  print(f"[MODULE] 📦              :[{i}/{len(modules_list)}] {pip_name}{f' (version: {version_req})' if version_req else ''}{f' [import: {import_name}]' if pip_name != import_name else ''}")
             try:
                 success = CheckFileDependencies.ensure_module( module_name=module_name, auto_update=auto_update, verbose=verbose, time_out=timeout )
-                if success:
-                    results[module_name], successful_count = True, successful_count + 1
-                    if verbose: print(f"[MODULE] ✅ [{i}/{len(modules_list)}] Success: {pip_name}")
-                else:
-                    results[module_name], failed_count = False, failed_count + 1
-                    if verbose: print(f"[MODULE] ❌ [{i}/{len(modules_list)}] Failed: {pip_name}")
+                if success: results[module_name], successful_count = True, successful_count + 1
+                else: results[module_name], failed_count = False, failed_count + 1
+                if verbose: print(f'[MODULE] {"✅" if success else "❌"}'+f' [{i:>2d}/{len(modules_list):<2d}]'.ljust(13)+f': {pip_name}')
             except Exception as e:
                 error_msg = f"Error processing {pip_name}: {str(e)}"
                 results[module_name], failed_count = error_msg, failed_count + 1
@@ -328,13 +342,13 @@ class CheckFileDependencies:
         if time_out is not None: time_out = CheckFileDependencies.TIMEOUT
         if CheckFileDependencies.VERBOSE_def: print(f"ensure_module '{module_name}' , auto_update: {auto_update}, verbose: {verbose}, timeout: {time_out}")
         if not isinstance(module_name, str) or not module_name.strip(): 
-            if verbose: print(f"[MODULE] ❌ ERROR       : module_name have to be a non-empty string")
+            if verbose: print(f"\n[MODULE] ❌ ERROR       : module_name have to be a non-empty string")
             raise ValueError("module_name must be a non-empty string")
         pip_name, version_requirement, import_name = CheckFileDependencies._parse_module_requirement(module_name)
-        if verbose: print(f"[MODULE] 🔍 checking     : {pip_name} ({import_name}{', ' + version_requirement if version_requirement else ''})")
+        if verbose: print(f"\n[MODULE] 🔍 checking     : {pip_name} ({import_name}{', ' + version_requirement if version_requirement else ''})")
         try: # check module is available
             if not CheckFileDependencies.is_module_available(module_name):
-                if verbose: print(f"[MODULE] ❓ not exist   : {pip_name}")
+                if verbose: print(f"[MODULE] ❓ not exist    : {pip_name}")
                 if not CheckFileDependencies.install_module(module_name, verbose, time_out): return False
             else: # Module not available, try to install it
                 current_version = CheckFileDependencies.get_installed_version(module_name)
@@ -348,8 +362,7 @@ class CheckFileDependencies:
                     try: # check version requirement
                         if not CheckFileDependencies.is_version_compatible(current_version, version_requirement):
                             if verbose: print(f"[MODULE] ⚠️  version mismatch: {pip_name} (current: {current_version}, required: {version_requirement})")
-                            CheckFileDependencies.update_module(module_name=module_name, check_newer=False, verbose=verbose, timeout=time_out)
-                            return CheckFileDependencies.ensure_module(module_name=module_name, auto_update=False, verbose=verbose, time_out=time_out)
+                            return CheckFileDependencies.update_module(module_name=module_name, check_newer=False, verbose=verbose, timeout=time_out)
                         else: # Version requirement is met, dont update
                             if verbose: print(f"[MODULE] ✅ ready to use : {pip_name}{f" (v{current_version})" if current_version else ""}")
                     except VersionComparisonError as e:
@@ -385,27 +398,28 @@ class CheckFileDependencies:
         """ Install a module using pip and return True if successful, False otherwise."""
         if CheckFileDependencies.VERBOSE_def: print(f"install_module '{module_name}' , verbose: {verbose}, timeout: {timeout}")
         if not isinstance(module_name, str) or not module_name.strip(): raise ValueError("module_name must be a non-empty string")
-        pip_name, _, _ = CheckFileDependencies._parse_module_requirement(module_name)
-        command = [sys.executable, "-m", "pip", "install", "-U", pip_name]
-        if verbose: print(f"[MODULE] 📥 installing   : {pip_name}")
+        pip_name, version_req, _ = CheckFileDependencies._parse_module_requirement(module_name)
+        # Sürüm gereksinimi varsa pip_name'e ekle
+        pip_install_str = pip_name + (version_req if version_req else "")
+        command = [sys.executable, "-m", "pip", "install", "-U", pip_install_str]
+        if verbose: print(f"[MODULE] 📥 installing   : {pip_install_str}")
         try:
             success, stdout, stderr = CheckFileDependencies.run_cmd_command(command, timeout=timeout)
             if not success:  
-                error_msg = f"Module installation failed: {pip_name} - {stderr}"
-                if verbose: print(f"[MODULE] ❌ ERROR INSTALL: {pip_name}\n\n{stderr}")
+                error_msg = f"Module installation failed: {pip_install_str} - {stderr}"
+                if verbose: print(f"[MODULE] ❌ ERROR INSTALL: {pip_install_str}\n\n{stderr}")
                 raise ModuleInstallationError(error_msg)
         except subprocess.TimeoutExpired as e: 
-            error_msg = f"Module installation timeout: {pip_name}"
-            if verbose: print(f"[MODULE] ❌ TIMEOUT INSTALL: {pip_name}")
+            error_msg = f"Module installation timeout: {pip_install_str}"
+            if verbose: print(f"[MODULE] ❌ TIMEOUT INSTALL: {pip_install_str}")
             raise ModuleInstallationError(error_msg)
         except ModuleInstallationError:  raise 
         except Exception as e:
-            error_msg = f"Module installation failed: {pip_name} - {str(e)}"
-            if verbose: print(f"[MODULE] ❌ ERROR INSTALL: {pip_name}\n\n{str(e)}")
+            error_msg = f"Module installation failed: {pip_install_str} - {str(e)}"
+            if verbose: print(f"[MODULE] ❌ ERROR INSTALL: {pip_install_str}\n\n{str(e)}")
             raise ModuleInstallationError(error_msg)
-        if verbose: print(f"[MODULE] ✅ installed   : {pip_name}")
+        if verbose: print(f"[MODULE] ✅ installed    : {pip_install_str}")
         return True
-    
 
     @staticmethod
     def check_module_newer_version(module_name: str) -> bool:
@@ -836,4 +850,25 @@ def USAGE_EXAMPLE():
 
 
 if __name__ == "__main__":
-    USAGE_EXAMPLE()
+    parser = argparse.ArgumentParser(description="Python modül bağımlılıklarını kontrol et ve yükle/güncelle.")
+    parser.add_argument("-r", "--requirements", type=str, default="requirements.txt",help="requirements.txt dosya yolu (varsayılan: requirements.txt)" )
+    parser.add_argument("-v", "--verbose", action="store_true", help="Detaylı çıktı göster")
+    parser.add_argument("-a", "--auto-update", action="store_true", help="Sürüm uyumsuzluklarında otomatik güncelle")
+    parser.add_argument( "-t", "--timeout", type=int, default=300, help="Her pip işlemi için zaman aşımı (saniye)" )
+
+    args = parser.parse_args()
+
+    print(f"\n[CheckFileDependencies] requirements.txt kontrolü başlatılıyor: {args.requirements}\n")
+    try:
+        results = CheckFileDependencies.check_requirements_txt( requirements_path=args.requirements, auto_update=args.auto_update, verbose=args.verbose, timeout=args.timeout )
+        failed = [k for k, v in results.items() if v is not True]
+        if failed:
+            print(f"\n❌ Eksik veya hatalı modüller ({len(failed)}):")
+            for mod in failed:  print(f"  - {mod}: {results[mod]}")
+            exit(1)
+        else:
+            print("\n✅ Tüm bağımlılıklar yüklü ve uyumlu!")
+            exit(0)
+    except Exception as e:
+        print(f"\n[ERROR] {e}")
+        exit(2)

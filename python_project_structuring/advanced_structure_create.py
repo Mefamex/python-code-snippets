@@ -7,8 +7,9 @@
 ===========================================================
 
 Description:
-    Bu proje, Python uygulamaları için gelişmiş bir klasör yapısı oluşturmayı amaçlamaktadır.
-    Kullanıcıların projelerini daha iyi organize etmelerine yardımcı olur.
+    Bu script, Python uygulamaları için gelişmiş bir klasör yapısı oluşturmayı amaçlamaktadır.
+    Kullanıcıların projelerini daha iyi organize etmelerine yardımcı olur. Otomatik olarak
+    modern Python projesi için gerekli tüm dosya ve klasörleri oluşturur.
 
 Author:
     mefamex (info@mefamex.com) (https://mefamex.com)
@@ -18,46 +19,70 @@ Links:
     - https://github.com/Mefamex/python-code-snippets/
 
 Features: 
-    - 
+    - Gelişmiş Python proje yapısı oluşturma
+    - Src-layout pattern desteği
+    - Test yapısı (unit, integration, e2e, performance)
+    - GitHub Actions workflow'ları
+    - Docker desteği
+    - Dokümantasyon yapısı (Sphinx)
+    - Pre-commit hooks
+    - Otomatik dosya içeriği oluşturma
 
 Modules:
-    - 
+    - CreateStructure: Ana proje yapısı oluşturucu sınıfı
+    - GET_PROJECT_STRUCTURE: Proje dosya listesi fonksiyonu
 
 Classes:
-    - 
+    - CreateStructure: Proje yapısı oluşturma ve yönetimi
 
 Functions:
-    - 
+    - GET_PROJECT_STRUCTURE(): Proje dosya yapısını döndürür
+    - write_py(): Python dosyaları için şablon içerik oluşturur
+    - write_md(): Markdown dosyaları için şablon içerik oluşturur
 
 Usage:
+    python advanced_structure_create.py [proje_adı]
     
+    Etkileşimli mod:
+    - Enter: Mevcut proje adını kullan
+    - "..": Bir üst dizine çık
+    - ".": Mevcut klasör adını kullan
+    - "klasör/": Belirtilen klasöre geç
+    - "yeni_ad": Yeni proje adı belirle
 
 Requirements:
-    - 
+    - Python 3.8+
+    - os, sys, datetime modülleri (standart kütüphane)
 
 Installation:
-    - 
+    Tek dosya, bağımlılık gerektirmez. Doğrudan çalıştırılabilir.
 
 Documentation: 
-    - 
+    Dosya içinde detaylı açıklamalar ve kullanım örnekleri mevcut.
 
 License:
     MIT Lisansı (https://opensource.org/licenses/MIT)
 
 Changelog:
-    - 1.0.0 (2025-08-10): Initial release
+    - 1.0.1 (2025-08-11): Düzeltmeler ve iyileştirmeler
+    - 1.0.0 (2025-08-10): İlk sürüm
 
 Contributors:
-    
+    - mefamex (ana geliştirici)
 
 Contact:
-    
+    E-posta: info@mefamex.com
+    Web    : https://mefamex.com
 
 Additional Information:
-    
+    Bu araç, modern Python geliştirme standartlarına uygun proje yapıları oluşturur.
+    Src-layout pattern, pytest, tox, pre-commit, GitHub Actions gibi endüstri 
+    standartlarını destekler.
 
 Notes:
-    - 
+    - Mevcut dosyaların üzerine yazmaz, sadece boş dosyalara içerik ekler
+    - Platform bağımsız çalışır (Windows/Linux/macOS)
+    - Proje adında özel karakterler otomatik olarak temizlenir
 
 Disclaimer and Legal Notice:
     Bu yazılım, herhangi bir garanti olmaksızın "olduğu gibi" sağlanmaktadır. 
@@ -71,39 +96,49 @@ Disclaimer and Legal Notice:
 
 """
 
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 __author__ = "mefamex"
 __email__ = "info@mefamex.com"
 __license__ = "MIT"
-__status__ = "DEVELOPMENT"  # or PRODUCTION, BETA, ALPHA, PROTOTYPE, STABLE, DEPRECATED, MAINTENANCE, EXPERIMENTAL, PREVIEW, ARCHIVED
+__status__ = "DEVELOPMENT"
 
 __project_name__ = "advanced_py_project_structure_create"
 __url__ = "https://mefamex.com/projects/"
-__url_github__ = "https://github.com/Mefamex/"
-__copyright__ = "mefamex"
-__description__ = ""
-__date__ = "" # YYYY-MM-DD
-__date_modify__ = "" # YYYY-MM-DD
-__python_version__ = "" 
+__url_github__ = "https://github.com/Mefamex/python-code-snippets/"
+__copyright__ = "Copyright © 2025 mefamex"
+__description__ = "Python uygulamaları için gelişmiş klasör yapısı oluşturucu"
+__date__ = "2025-08-10"
+__date_modify__ = "2025-08-11"
+__python_version__ = "3.8+" 
 __dependencies__ = {
+    "required": [],  # Standart kütüphane modülleri kullanılıyor
 }
 
 #================================================================================
 
 
-#============================  [name of field] =========================================
+
+
+#============================  IMPORTS =========================================
 import os, sys, datetime
 from time import sleep 
+from typing import Final # for const variables
 #================================================================================
 
 
 
-#============================ [name of field] =========================================
-PROJECT_NAME : str = "my_awesome_project"
+#============================  CONSTS =========================================
+PATH_SEP: Final[str] = os.path.sep
+#================================================================================
 
 
-def GET_PROJECT_STRUCTURE(project_name: str = PROJECT_NAME) -> list[str]:
-    return [
+
+
+#============================  PROJECT STRUCTURE =========================================
+
+def GET_PROJECT_STRUCTURE(name: str) -> list[str]:
+    project_name: str = name.strip() + ""
+    return [p.replace("/", PATH_SEP) for p in  [
         "README.md",
         "LICENSE",
         ".gitignore",
@@ -215,76 +250,108 @@ def GET_PROJECT_STRUCTURE(project_name: str = PROJECT_NAME) -> list[str]:
         ".github/ISSUE_TEMPLATE/security_report.md",
         ".github/pull_request_template.md",
         ".github/dependabot.yml"
-    ]
-
-
-
+    ] ]
 #================================================================================
 
 
-#============================ [name of field] =========================================
 
-def write_py(root:str, file_name:str) -> None:
-    relative_path= os.path.relpath(os.path.join(root, file_name), start=".")
-    with open(os.path.join(root, file_name), "a", encoding="utf-8") as py_file: py_file.write(f'# -*- coding: utf-8 -*-\n# created at: {datetime.datetime.now().isoformat(timespec="seconds")}Z\n\n"""\n===========================================================\n        {relative_path}/{file_name}\n===========================================================\n\nDescription:\n    -\n\nAuthor:\n    Name (mail@site.com) (https://website.com)\n\nLinks: \n    - https://example.com/\n    - https://github.com/\n\nFeatures: \n    - \n\nModules:\n    - \n\nClasses:\n    - \n\nFunctions:\n    - \n\nUsage:\n    \n\nRequirements:\n    - \n\nInstallation:\n    - \n\nDocumentation: \n    - \n\nLicense:\n    - \n\nChangelog:\n    - 1.0.0 ({datetime.datetime.now().strftime("%Y-%m-%d")}): \n\nContributors:\n\nContact:\n\nAdditional Information:\n\nNotes:\n\nDisclaimer and Legal Notice:\n\n===========================================================\n\n"""\n\n\nif __name__ == "__main__": pass\n\n')
 
-def write_md(root:str, file_name:str) -> None:
-    relative_path= os.path.relpath(os.path.join(root, file_name), start=".")
-    with open(os.path.join(root, file_name), "a", encoding="utf-8") as md_file: md_file.write(f'# {(file_name[:-3] if file_name.endswith(".md") else  file_name).upper()}\n\n> **project**: {PROJECT_NAME}<br>\n> **created**: {datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}<br>\n> **folder** : {relative_path}\n\n')
 
-def create_structure() -> None:
-    """ Dont forget: this function run on {PROJECT_NAME}"""
-    structure = GET_PROJECT_STRUCTURE()
-    for path in structure:
-        full_path = os.path.join(path)
-        dir_name = os.path.dirname(full_path)
-        if dir_name and not os.path.exists(dir_name): os.makedirs(dir_name, exist_ok=True)
-        if not path.endswith("/"):
-            with  open(full_path, "a", encoding="utf-8") as f: f.write("")
-    for root , _ , files in os.walk(os.path.abspath(".")):
-        indent = "│    " * (root.count(os.sep)-os.path.abspath(".").count(os.sep))
-        print(f'{indent}│\n{indent}├── {os.path.basename(root)}/')
-        for f in files:
+#============================ MAIN CLASS =========================================
+
+class CreateStructure:
+    def __init__(self, project_name: str = "my_awesome_project") -> None:
+        self.PROJECT_NAME = project_name + ""
+
+    def run(self) -> None:
+        self.set_project_name()
+        self.create_folder()
+        self.create_structure() 
+        print(f"[INFO] Proje yapısı oluşturuldu: {self.PROJECT_NAME}")
+    
+    def set_project_name(self) -> None:
+        sleep(0.5)
+        print(f'\n\n"name"    -> yeni isim gir\n".."      -> bir üst klasöre çık\n"."       -> mevcut klasörü kullan\n"klasör{os.path.sep}" -> o klasöre geç\n')
+        print(f'\n[INFO] Proje adı    : "{self.PROJECT_NAME}" ({os.getcwd()})\n')
+        inp= input("[ASK ] Proje oluşturulsun mu?\n             (enter) / (yeni proje adı) ->").strip()
+        if inp.lower() in ["y", "yes", ""]:  
+            print(f"\n[INFO] Proje oluşturuluyor : \n         ->  {self.PROJECT_NAME}\n         ->  {os.path.abspath(self.PROJECT_NAME)}\n")
+            return
+        elif inp.lower() == "..":
+            os.chdir("..")
+        elif inp.lower() == ".": 
+            self.PROJECT_NAME = os.path.basename(os.getcwd())
+            os.chdir("..")
+        elif inp.endswith(os.path.sep):
+            os.chdir(inp)
+        else:
+            self.PROJECT_NAME = inp+""
+            print(f'[OKEY] ')
+        self.set_project_name()
+        sleep(0.5)
+
+    def create_folder(self):
+        """ Create the project folder and chdir"""
+        os.makedirs(self.PROJECT_NAME, exist_ok=True)
+        os.chdir(self.PROJECT_NAME)
+        print(f"\n[INFO] Proje klasörü oluşturuldu: {self.PROJECT_NAME}")
+        print(f"[INFO] Proje klasörüne geçildi  : {os.getcwd()}\n")
+
+
+    def create_structure(self) -> None:
+        """ Dont forget: this function run on {PROJECT_NAME}"""
+        NotEmpty = []
+        structure = GET_PROJECT_STRUCTURE(self.PROJECT_NAME)
+        base_depth = os.path.abspath(".").count(os.sep)
+        for path in structure:
+            full_path = os.path.join(path)
+            dir_name = os.path.dirname(full_path)
+            if dir_name and not os.path.exists(dir_name): os.makedirs(dir_name, exist_ok=True)
+            if not path.endswith(os.path.sep):
+                with open(full_path, "a", encoding="utf-8") as f: f.write("")
+                depth = full_path.count(os.sep) - base_depth
+                indent = "│    " * depth
+                print(f"{indent}├── {os.path.basename(full_path)}",end="")
+                isEmpty = True
+                if full_path.endswith(".py"):
+                    isEmpty = self.write_py(os.path.dirname(full_path), os.path.basename(full_path))
+                if full_path.endswith(".md"):
+                    isEmpty = self.write_md(os.path.dirname(full_path), os.path.basename(full_path))
+                if isEmpty:print()
+                else: 
+                    print("   [ ! NOT EMPTY]")
+                    NotEmpty += [full_path]
             sleep(0.05)
-            indent = "│    " * (root.count(os.sep)-os.path.abspath(".").count(os.sep)+1)
-            print(f'{indent}├── {f}/')
-            if f.endswith(".py"): write_py(root,f)
-            if f.endswith(".md"): write_md(root,f)
-        sleep(0.2)
+        if NotEmpty: 
+            print(f"\n\n[INFO] Not empty files found:")
+            for path in NotEmpty:
+                print(f" - {path}")
+
+    def write_md(self, root:str, file_name:str) -> bool:
+        """ returns: bool: file is empty ? """
+        relative_path= os.path.relpath(os.path.join(root, file_name), start=".")
+        isEmpty = os.path.getsize(os.path.join(root, file_name)) == 0
+        with open(os.path.join(root, file_name), "a", encoding="utf-8") as md_file: md_file.write(f'# {(file_name[:-3] if file_name.endswith(".md") else  file_name).upper()}\n\n> **project**: {self.PROJECT_NAME}<br>\n> **created**: {datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}<br>\n> **folder** : {relative_path}\n\n')
+        return isEmpty
+
+    def write_py(self, root:str, file_name:str) -> bool:
+        """ returns: bool: file is empty ? """
+        relative_path= os.path.relpath(os.path.join(root, file_name), start=".")
+        isEmpty = os.path.getsize(os.path.join(root, file_name)) == 0
+        with open(os.path.join(root, file_name), "a", encoding="utf-8") as py_file: py_file.write(f'# -*- coding: utf-8 -*-\n# created at: {datetime.datetime.now().isoformat(timespec="seconds")}Z\n\n"""\n===========================================================\n        {(relative_path).replace(os.path.sep," -> ")}\n===========================================================\n\nDescription:\nAuthor: Name (mail@site.com) (https://website.com)\nLinks: - https://github.com/\nFeatures: -\nModules: -\nClasses: -\nFunctions: -\nUsage: \nRequirements: -\nInstallation: -\nDocumentation: -\nLicense: -\nChangelog: - 1.0.0 ({datetime.datetime.now().strftime("%Y-%m-%d")}): created by autoStructer\nContributors: -\nContact: -\nAdditional Information: \nNotes: -\nDisclaimer and Legal Notice: \n\n===========================================================\n"""\n\n\nif __name__ == "__main__":\n    pass\n\n')
+        return isEmpty
 
 
 
-def create_folder():
-    """ Create the project folder and chdir"""
-    os.makedirs(PROJECT_NAME, exist_ok=True)
-    os.chdir(PROJECT_NAME)
-    print(f"\n[INFO] Proje klasörü oluşturuldu: {PROJECT_NAME}")
-    print(f"[INFO] Proje klasörüne geçildi  : {os.getcwd()}\n")
 
-def set_project_name() -> None:
-    global PROJECT_NAME
-    sleep(0.5)
-    print(f'\n[INFO] Proje adı    : "{PROJECT_NAME}" ({os.path.abspath(PROJECT_NAME)})\n')
-    inp= input("[ASK ] Proje oluşturulsun mu?\n             (enter) / (yeni proje adı) ->").strip()
-    if inp.lower() in ["y", "yes", ""]:  print(f"\n[INFO] Proje oluşturuluyor : \n         ->  {PROJECT_NAME}\n         ->  {os.path.abspath(PROJECT_NAME)}\n")
-    else:
-        PROJECT_NAME = inp+""
-        print(f'[OKEY] ')
-        set_project_name()
-    if os.path.exists(PROJECT_NAME):
-        print(f"[WARN] Klasör zaten mevcut: {PROJECT_NAME} ({os.path.abspath(PROJECT_NAME)})")
-        inp2 = input("[ASK ] Devam edilsin mi? (enter / n ) ").strip()
-        if inp2.lower() not in ["y", "yes", ""]: set_project_name()
-    sleep(0.5)
+
 
 
 if __name__ == "__main__":
-    if len(sys.argv) > 1: PROJECT_NAME = sys.argv[1]
-    set_project_name()
-    create_folder()
-    # Changed dir to PROJECT_NAME at create_folder
-    create_structure() 
-    print(f"Proje klasör yapısı başarıyla oluşturuldu: {PROJECT_NAME}")
+    structer = CreateStructure()
+    if len(sys.argv) > 1: structer.PROJECT_NAME = sys.argv[1].strip()
+    structer.run()
+
 
 
 
