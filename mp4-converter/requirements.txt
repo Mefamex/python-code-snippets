@@ -2,8 +2,8 @@
 # Install with: pip install -r requirements.txt
 
 # Package manager and core tools
-pip
-argparse
+pip>=21.0.0
+setuptools>=50.0.0
 
 # Core dependencies
 opencv-python>=4.5.0
@@ -12,9 +12,17 @@ numpy>=1.21.0
 # Optional but recommended for better performance
 opencv-contrib-python>=4.5.0
 
+# For EXE building
+pyinstaller>=5.0.0
+
+# Development tools (optional)
+pytest>=6.0.0
+flake8>=4.0.0
+
 # Standard library modules (no installation needed - included for documentation)
 # pathlib - built-in
 # typing - built-in
 # os - built-in
 # sys - built-in
 # time - built-in
+# argparse - built-in

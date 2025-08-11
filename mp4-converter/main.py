@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*- 
-#!/usr/bin/env python3 
 
 """
 ===========================================================
@@ -45,7 +44,7 @@ Usage:
     python main.py --help-me
 
 Requirements:
-    - Python 3.8+
+    - Python 3.9+
     - Dependencies:
         - opencv-python (>=4.5.0)
         - pathlib (standart)
@@ -81,7 +80,7 @@ Legal Notice:
 
 __version__ = "1.0.1"
 __author__ = "mefamex"
-__email__ = "info@mefaex.com"
+__email__ = "info@mefamex.com"
 __license__ = "MIT"
 __status__ = "DEVELOPMENT"
 
@@ -107,25 +106,21 @@ __dependencies__ = {
 ############### IMPORTS and CONFIG ####################
 
 
-import os, sys, subprocess 
+import io, os, sys, subprocess 
 from time import sleep
-from typing import Optional
 from pathlib import Path
+from resize import Resize
+
+try: sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+except (ValueError, AttributeError): pass
+
 
 # check
 try : import argparse 
 except : subprocess.call(['python.exe','-m',"pip","install","-U","argparse"], text=True,encoding='utf-8')
-try : import cv2 
-except : subprocess.call(['python.exe','-m',"pip","install","-U","opencv-python"], text=True,encoding='utf-8')
-try : import numpy 
-except : subprocess.call(['python.exe','-m',"pip","install","-U","numpy"], text=True,encoding='utf-8')
-#import
-import argparse, cv2
+import argparse
 
 
-DEF_CODEC : str = 'mp4v'
-DEF_FPS   : float = 30.0
-DEF_HEIGHT: int = 720
 DEF_CODECS: list[str] = ['mp4v', 'XVID', 'H264', 'MJPG', 'X264', 'DIVX', 'VP80', 'VP90', 'HEVC', 'AV01']
 DEF_EXTENSIONS: list[str] = ['mp4', 'avi', 'mkv', 'mov', 'wmv', 'flv', 'webm', 'm4v', '3gp', 'asf', 'mpg', 'mpeg', 'mp2', 'mts', 'm2ts', 'ts', 'vob', 'ogv', 'dv', 'rm', 'rmvb']
 
@@ -133,14 +128,14 @@ DEF_EXTENSIONS: list[str] = ['mp4', 'avi', 'mkv', 'mov', 'wmv', 'flv', 'webm', '
 CODEC_INFO: dict[str, str] = {
     'mp4v': 'En uyumlu, orta kalite, orta dosya boyutu',
     'XVID': 'Eski cihazlarla uyumlu, iyi sıkıştırma',
-    'H264': 'Modern standart, yüksek kalite (OpenH264 dll gerekli)',
+    'H264': 'Modern standart, yüksek kalite (mükemmel uyumluluk)',
     'MJPG': 'En güvenli, düşük sıkıştırma, büyük dosya',
     'X264': 'H264 alternatifi, iyi kalite',
     'DIVX': 'XVID benzeri, popüler codec',
     'VP80': 'Google VP8, açık kaynak',
     'VP90': 'Google VP9, VP8\'den daha iyi',
     'HEVC': 'H265, en iyi sıkıştırma, yeni cihazlar',
-    'AV01': 'AV1, gelecek nesil, en iyi sıkıştırma'
+    'AV01': 'AV1, gelecek nesil, en iyi sıkıştırma',
 }
 
 # Uzantı açıklamaları
@@ -180,128 +175,47 @@ QUALITY_PRESETS: dict[str, dict] = {
 
 def flat_dict(d:dict, title=""):
     r, max_key_length = (f"{title}:\n" if title else ""), max(len(key) for key in d.keys())
-    for key, value in d.items():  r += f"    - {key.rjust(max_key_length)}: {value}\n"
+    for key, value in d.items():  r += f"    {key.rjust(max_key_length)} : {value}\n"
     return(r)
 
 ############### resize CLASS  ####################
+DEF_CODEC : str = 'mp4v'
+DEF_FPS   : float = 30.0
+DEF_HEIGHT: int = 720
 
-class Resize:
-    def __init__(self, input_file, height: Optional[int] = DEF_HEIGHT, fps: float = DEF_FPS, codec: str = DEF_CODEC):
-        self.input_file: Path = Path.absolute(Path(input_file))
-        self.clip: cv2.VideoCapture
-        if not self.open_file(): return
-        
-        self.height: int = height if height else 720
-        if fps is None: fps = self.clip.get(cv2.CAP_PROP_FPS)
-        self.fps: float = fps
-        self.codec: str = codec if codec else DEF_CODEC  # H264, mp4v, XVID, MJPG
-        self.input_name: str = self.input_file.stem
-        self.output_file: Path = self.input_file.parent / f"{self.input_name}_resized_{self.height}_{self.fps}fps_.mp4"
-        self.output_name: str = self.output_file.stem
-        self.bilgi_yazdir()
-        sleep(3)
-        
-        if not self.resize_save(): return
-        try: self.clip.release()
-        except : pass
-
-    def bilgi_yazdir(self): print(f"\nResizing video: {self.input_name}\n         path : {self.input_file}\n\n  output name : {self.output_name}\n  output path : {self.output_file}\n\n       height : {self.height}px <- {self.clip.get(cv2.CAP_PROP_FRAME_HEIGHT)} x {self.clip.get(cv2.CAP_PROP_FRAME_WIDTH)} px\n          fps : {self.fps} <- {self.clip.get(cv2.CAP_PROP_FPS)}\n        codec : {"".join([chr((int(self.clip.get(cv2.CAP_PROP_FOURCC)) >> 8 * i) & 0xFF) for i in range(4)])}\n")
-
-    def open_file(self) -> bool:
-        print("\nDOSYA AÇILIYOR")
-        try:
-            self.clip = cv2.VideoCapture(str(self.input_file))
-        except Exception as e:
-            print("\n"+str(e))
-            print("\n HATA OLUŞTU DOSYA KAPATILIYOR")
-            self.clip.release()
-            return False
-        sleep(1)
-        return True
-
-    def resize_save(self) -> bool:
-        print("BOYUTLANDIRILIYOR")
-        try:
-            new_width : int = int(self.height * self.clip.get(cv2.CAP_PROP_FRAME_WIDTH) / self.clip.get(cv2.CAP_PROP_FRAME_HEIGHT))
-            out = cv2.VideoWriter(str(self.output_file), cv2.VideoWriter.fourcc(*self.codec), self.fps, (new_width, self.height))
-            corrupted_frames, successful_frames, last_good_frame = 0, 0, None
-            while True:
-                frame_idx,total_frames  = int(self.clip.get(cv2.CAP_PROP_POS_FRAMES)), int(self.clip.get(cv2.CAP_PROP_FRAME_COUNT))+1
-                if frame_idx % 50 == 0 or frame_idx == total_frames:  print(f"\rİlerleme: {(frame_idx/total_frames)*100:.2f}% - Bozuk frame: {corrupted_frames}", end="")
-                ret, frame = self.clip.read()
-                if not ret: break 
-                # Frame Kontrolü
-                if frame is None or frame.size == 0:
-                    print(f"\nBozuk frame tespit edildi: {frame_idx}")
-                    corrupted_frames += 1
-                    if last_good_frame is not None: frame = last_good_frame.copy()
-                    else: continue
-                try:
-                    if frame.shape[0] == 0 or frame.shape[1] == 0:
-                        print(f"\nGeçersiz frame boyutu: {frame_idx}")
-                        corrupted_frames += 1
-                        if last_good_frame is not None:  frame = last_good_frame.copy()
-                        else:  continue
-                    resized_frame = cv2.resize(frame, (new_width, self.height))
-                    if resized_frame is None or resized_frame.size == 0:
-                        print(f"\nResize hatası: {frame_idx}")
-                        corrupted_frames += 1
-                        continue
-                    out.write(resized_frame)
-                    successful_frames += 1
-                    last_good_frame = frame  # Geçerli frame'i sakla
-                except Exception as e:
-                    print(f"\nFrame işleme hatası {frame_idx}: {str(e)}")
-                    corrupted_frames += 1
-                    continue
-            # Temizlik
-            self.clip.release()
-            out.release()
-            cv2.destroyAllWindows()
-            # Özet rapor
-            print(f"\n{'='*50}")
-            print(f"DÖNÜŞÜM TAMAMLANDI")
-            print(f"Başarılı frame'ler: {successful_frames}")
-            print(f"Bozuk frame'ler: {corrupted_frames}")
-            print(f"Başarı oranı: %{(successful_frames/(successful_frames+corrupted_frames))*100:.1f}")
-            print(f"{'='*50}")
-            return True
-        except Exception as e:
-            print('\nDÖNÜŞTÜRME HATASI\n'+str(e))
-            return False
 
 def get_user_input():
     """Kullanıcıdan video dönüştürme parametrelerini al"""
     for q in bilgilendirme.split("\n"):
         print(q)
-        sleep(0.05)
+        sleep(0.03)
     sleep(1)
     print("\n" + "="*50 + "🎬 VIDEO DÖNÜŞTÜRÜCÜ"+ "="*50+ "\n\n")
     video_files = []
     while True:
-        path = input("MEVCUT KLASÖR: "+os.getcwd()+" <- (enter)"+"\n📁 Video dosyası veya klasör yolu: ").strip() 
+        path = input("MEVCUT KLASÖR: "+os.getcwd()+" <- (enter)"+"\n📁 Video dosyası veya klasör yolu: ").strip().removeprefix('\t').removesuffix('\t').removeprefix('\n').removesuffix('\n').removeprefix('"').removesuffix('"').removeprefix('\'').removesuffix('\'')
         if path in ["\n", ""]: path = os.getcwd()
+        path = Path(path.strip('\'"')).resolve()
         if not Path(path).exists(): print(f"❌ Yol bulunamadı: {path}")
-        path = Path(path)
         if path.is_file(): break
         elif path.is_dir():
             video_files = [Path(path) / q for q in os.listdir(path) if q.lower().endswith(tuple(DEF_EXTENSIONS))]
             if video_files: break
             print("❌ Klasörde video dosyası bulunamadı!")
-        else: print("❌ Geçersiz yol!")
+        else: print("❌ Geçersiz yol!  üst dizini: ", path.parent)
     print(f"\n🎬 Seçilen dizin   : {path}")
     if video_files: print(f"🎬 Seçilen videolar: {len(video_files)} adet "+ "\n    - ".join(str(f) for f in video_files))
     # HEIGHT
     height = None
     while True:
-        height, height_input = DEF_HEIGHT, input("\n📏 Hedef yükseklik (varsayılan: 720 , tavsiye: 1080): ").strip()
+        height, height_input = DEF_HEIGHT, input(f"\n📏 Hedef yükseklik (varsayılan: {DEF_HEIGHT}): ").strip()
         if not height_input: break
         try:
             height = int(height_input)
             if height > 240 and height < 4320: break
             print("❌ Yükseklik 240-4320 arasında olmalı!")
         except ValueError: print("❌ Geçersiz sayı!")
-    print(f"\n📏 Hedef yükseklik: {height} px (varsayılan: {DEF_HEIGHT})")
+    print(f"📏 Hedef yükseklik: {height} px (varsayılan: {DEF_HEIGHT})")
     # FPS
     fps = DEF_FPS
     while True:
@@ -316,12 +230,12 @@ def get_user_input():
                 break
             except ValueError:  print("❌ Geçersiz sayı!"); fps_input = None
         else: break
-    print(f"\n⚡ Hedef FPS: {fps} (varsayılan: {DEF_FPS})")
+    print(f"⚡ Hedef FPS: {fps} (varsayılan: {DEF_FPS})")
     # CODEC
     codec = ""
-    print(f"\n🎥 Codec seçenekleri: {', '.join(DEF_CODECS)}\n{flat_dict(CODEC_INFO)}\n")
+    print(f"\n🎥 Codec seçenekleri: {', '.join(DEF_CODECS)}\n{flat_dict(CODEC_INFO)}")
     while codec not in DEF_CODECS or not codec:
-        codec = input("\n🎥 Codec (varsayılan: mp4v -> enter): ").strip()
+        codec = input("🎥 Codec (varsayılan: mp4v -> enter): ").strip()
         if codec in ["\n", ""]: codec = DEF_CODEC
         if codec not in DEF_CODECS: print(f"❌ Geçersiz codec! Seçenekler: {', '.join(DEF_CODECS)}")
         else: break
@@ -330,25 +244,20 @@ def get_user_input():
 
 
 bilgilendirme = f"""
-Örnekler:
-    video.mp4                          # Varsayilan ayarlarla
-    video.mp4 -y 1080                  # 1080p'ye donustur
-    Folder{os.sep}   -y 720 -f 24             # 720p, 24fps
-    Folder{os.sep}   -y 480 -f 30 -c XVID     # 480p, 30fps, XVID codec
 
 Boyut: -h
-    360p  = 0.5x dosya boyutu
-    480p  = 0.75x dosya boyutu  
-    720p  = 1x dosya boyutu   (varsayilan)
-    1080p = 2x dosya boyutu
-    1440p = 5x dosya boyutu
-    2160p = 10x dosya boyutu
+    360p  = 0.5x dosya boyutu  {"varsayilan" if DEF_HEIGHT == 360 else ""}
+    480p  = 0.75x dosya boyutu {"varsayilan" if DEF_HEIGHT == 480 else ""}
+    720p  = 1x dosya boyutu    {"varsayilan" if DEF_HEIGHT == 720 else ""}
+    1080p = 2x dosya boyutu    {"varsayilan" if DEF_HEIGHT == 1080 else ""}
+    1440p = 5x dosya boyutu    {"varsayilan" if DEF_HEIGHT == 1440 else ""}
+    2160p = 10x dosya boyutu   {"varsayilan" if DEF_HEIGHT == 2160 else ""}
 
 fps: -f
-    24    = 0.5x dosya boyutu
-    30    = 1x dosya boyutu   (varsayilan)
-    60    = 2x dosya boyutu
-    120   = 4x dosya boyutu
+    24    = 0.5x dosya boyutu {"varsayilan" if DEF_FPS == 24 else ""}
+    30    = 1x dosya boyutu   {"varsayilan" if DEF_FPS == 30 else ""}
+    60    = 2x dosya boyutu   {"varsayilan" if DEF_FPS == 60 else ""}
+    120   = 4x dosya boyutu   {"varsayilan" if DEF_FPS == 120 else ""}
 
 codec: -c
 {flat_dict(CODEC_INFO)}
@@ -358,71 +267,114 @@ format: -d
 
 Oneriler: 
 {flat_dict(QUALITY_PRESETS)}
-        """
+
+Örnekler:
+    path or file  -y <yükseklik>  -f <fps>  -c <codec>
+    video.mp4                          # Varsayilan ayarlarla
+    video.mp4 -y 1080                  # 1080p'ye donustur
+    Folder{os.sep}   -y 720 -f 24             # 720p, 24fps
+    Folder{os.sep}   -y 480 -f 30 -c XVID     # 480p, 30fps, XVID codec
+
+"""
 
 
 
 
 
 def main():
+    # PyInstaller'da stdout problemi için güvenli print
+    try: print(f"Python yolu : {sys.executable} \nMevcut dizin: {os.getcwd()}\n\n")
+    except: pass
+    
+    # OpenH264 setup'ını PyInstaller'da atla
+    if not getattr(sys, 'frozen', False):
+        try: 
+            import openH264_setup
+            openH264_setup.main()
+        except Exception as e:
+            try: print(f"⚠️ OpenH264 setup atlandı: {e}")
+            except: pass
+    else:
+        try: print("📦 EXE modunda çalışıyor, OpenH264 setup atlandı")
+        except: pass
+    
+    sleep(1)
     # Komut satırı argümanları parse et
     parser = argparse.ArgumentParser(
         description='Video Dönüştürücü - Video dosyalarını yeniden boyutlandırır',
-        usage='%(prog)s  <video_path(file or dir)> [options]',
+        usage='%(prog)s  <video_path(file or dir)> [-y <height>] [-f <fps>] [-c <codec>]',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog= bilgilendirme + ""
-    )
+        )
     
     parser.add_argument('path', nargs='?', help='Video dosyası yolu')
-    parser.add_argument('-y', '--height', type=int, default=DEF_HEIGHT, 
-                        help='Hedef yükseklik (varsayılan: {})'.format(DEF_HEIGHT))
-    parser.add_argument('-f', '--fps', type=float, 
-                        help='Hedef FPS (varsayılan: {})'.format(DEF_FPS))
-    parser.add_argument('-c', '--codec', choices=DEF_CODECS, 
-                        default=DEF_CODEC, help='Video codec (varsayılan: mp4v)')
+    parser.add_argument('-y', '--height', type=int, default=DEF_HEIGHT, help='Hedef yükseklik (varsayılan: {})'.format(DEF_HEIGHT))
+    parser.add_argument('-f', '--fps', type=float,  help='Hedef FPS (varsayılan: {})'.format(DEF_FPS))
+    parser.add_argument('-c', '--codec', choices=DEF_CODECS,  default=DEF_CODEC, help='Video codec (varsayılan: mp4v)')
     parser.add_argument('--help-me', action='store_true', help='Kullanıcıdan interaktif parametre al')
+    # PyInstaller uyumluluğu için özel version handler
+    parser.add_argument('--version', action='store_true', help='Versiyon bilgisini göster')
     
-    args = parser.parse_args()
-    if len(sys.argv) == 1 or '--help-me' in sys.argv:
-        try:
-            video_path, height, fps, codec = get_user_input()
-            args.path = video_path
-            args.height = height
-            args.fps = fps
-            args.codec = codec
-            Resize(video_path, height=height, fps=fps, codec=codec)
-        except KeyboardInterrupt:
-            print("\n\n❌ İşlem kullanıcı tarafından iptal edildi.")
-            sys.exit(1)
-    
-    if not args.path:
-        print("❌ Video dosyası yolu belirtilmedi!")
-        print("Mevcut Klasör dizin olarak belirlendi: {}".format(os.getcwd()))
-        args.path = os.getcwd()
+    # Önce argümanları parse et ve version kontrolü yap
+    try:
+        args = parser.parse_args()
+        if args.version:
+            print(f'{__project_name__} v{__version__} by {__author__}')
+            sys.exit(0)
+    except SystemExit as e: sys.exit(e.code)
+    try:
+        if len(sys.argv) == 1 or '--help-me' in sys.argv:
+            try:
+                video_path, height, fps, codec = get_user_input()
+                args.path = Path(video_path.strip('\'"')).resolve()
+                args.height = height
+                args.fps = fps
+                args.codec = codec
+            except KeyboardInterrupt:
+                print("\n\n❌ İşlem kullanıcı tarafından iptal edildi.")
+                sys.exit(1)
+        
+        if not args.path:
+            print("❌ Video dosyası yolu belirtilmedi!")
+            print("Mevcut Klasör dizin olarak belirlendi: {}".format(os.getcwd()))
+            args.path = os.getcwd()
 
-    # Dosya kontrolü
-    video_path = Path(args.path)
-    if not video_path.is_file() and not video_path.is_dir():
-        print(f"❌ Dosya veya klasör bulunamadı: {video_path}")
+        # Dosya kontrolü
+        video_path = Path(args.path)
+        if not video_path.is_file() and not video_path.is_dir():
+            print(f"❌ Dosya veya klasör bulunamadı: {video_path}")
+            sys.exit(1)
+        if video_path.is_file():
+            print(f"🚀 Başlatılıyor...")
+            print(f"📁 Dosya    : {args.path}")
+            print(f"📏 Yükseklik: {args.height}px")
+            print(f"⚡ FPS      : {args.fps if args.fps else DEF_FPS}")
+            print(f"🎥 Codec    : {args.codec}")
+            Resize(args.path, height=args.height, fps=args.fps, codec=args.codec)
+        if video_path.is_dir():
+            print(f"🚀 Başlatılıyor...")
+            video_files = [video_file for video_file in video_path.glob("*") if video_file.suffix.lower().lstrip('.') in [ext.lower() for ext in DEF_EXTENSIONS]]
+            print(f"📁 Klasör   : {len(video_files)} adet ->  {args.path}")
+            print(f"📏 Yükseklik: {args.height}px")
+            print(f"⚡ FPS      : {args.fps if args.fps else DEF_FPS}")
+            print(f"🎥 Codec    : {args.codec}\n")
+            sleep(5)
+            for video_file in video_files:
+                print(f"\n📁 Dosya : {video_files.index(video_file)+1}/{len(video_files)} {video_file}")
+                Resize(video_file, height=args.height, fps=args.fps, codec=args.codec)
+    except Exception as e:
+        print(f"\n\n❌ Hata oluştu: {e}")
+        sleep(1000)
         sys.exit(1)
-    if video_path.is_file():
-        print(f"🚀 Dönüştürme başlatılıyor...")
-        print(f"📁 Dosya: {args.path}")
-        print(f"📏 Yükseklik: {args.height}px")
-        print(f"⚡ FPS: {args.fps if args.fps else 'orijinal'}")
-        print(f"🎥 Codec: {args.codec}")
-        Resize(args.path, height=args.height, fps=args.fps, codec=args.codec)
-    if video_path.is_dir():
-        video_files = [video_file for video_file in video_path.glob("*") if video_file.suffix.lower().lstrip('.') in [ext.lower() for ext in DEF_EXTENSIONS]]
-        print(f"📁 Klasör   :{len(video_files)} adet ->  {args.path}")
-        print(f"📏 Yükseklik: {args.height}px")
-        print(f"⚡       FPS: {args.fps if args.fps else 'orijinal'}")
-        print(f"🎥    Codec: {args.codec}\n")
-        print(f"🚀 Dönüştürme başlatılıyor...")
-        sleep(5)
-        for video_file in video_files:
-            print(f"\n📁 Dosya : {video_files.index(video_file)+1}/{len(video_files)} {video_file}")
-            Resize(video_file, height=args.height, fps=args.fps, codec=args.codec)
+    sleep(1)
+    # Kullanıcıdan "r" tuşuna basmasını iste, "r" ise yeniden başlat, değilse çık
+    cevap = input("Yeniden başlatmak için 'r' tuşuna basın, çıkmak için herhangi bir tuşa basın...").strip().lower()
+    if cevap == "r":
+        if getattr(sys, 'frozen', False): os.execv(sys.executable, [sys.executable] + sys.argv[1:])
+        else: os.execv(sys.executable, ['python'] + sys.argv)
+    else:
+        print("Program sonlandırıldı.")
+        sys.exit(0)
 
 
 #import subprocess; subprocess.run(['ffmpeg', '-i', 'a.mp4', '-vf', 'scale=-1:1080', 'movie_resized.mp4'])

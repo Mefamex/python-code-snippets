@@ -48,6 +48,69 @@ Thumbs.db
 
 # Logs and Debug
 *.log
+debug.log
+error.log
+
+# Video Files (optional - uncomment if you don't want to track video files)
+# *.mp4
+# *.avi
+# *.mkv
+# *.mov
+# *.wmv
+# *.flv
+# *.webm
+
+# Codec Files
+# openh264*.dll  # Keep codec files tracked for distribution
+openh264*.bz2
+
+# Output Files
+*_resized.*
+*_converted.*
+*_1080p_*
+*_720p_*
+*_480p_*
+
+# Temporary Files
+temp/
+tmp/
+*.tmp
+*.temp
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Windows
+desktop.ini
+
+# macOS
+.AppleDouble
+.LSOverride
+
+# Thumbnails
+._*
+
+# Files that might appear in the root of a volume
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Directories potentially created on remote AFP share
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
 *.out
 *.err
 debug.log
