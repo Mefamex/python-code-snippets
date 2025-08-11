@@ -177,7 +177,7 @@ Bir dizinin bilgilerini tutar.
       "date": "2025-07-20",
       "relative_path": "subfolder",
       "full_url": "https://example.com/subfolder",
-      "folder": [],
+      "folder": [...],
       "files": [
         {
           "name": "example.txt",
@@ -190,7 +190,7 @@ Bir dizinin bilgilerini tutar.
       ]
     }
   ],
-  "files": []
+  "files": [...]
 }
 ```
 

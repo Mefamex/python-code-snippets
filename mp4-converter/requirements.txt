@@ -1,0 +1,20 @@
+# Video Resizer Tool - Python Dependencies
+# Install with: pip install -r requirements.txt
+
+# Package manager and core tools
+pip
+argparse
+
+# Core dependencies
+opencv-python>=4.5.0
+numpy>=1.21.0
+
+# Optional but recommended for better performance
+opencv-contrib-python>=4.5.0
+
+# Standard library modules (no installation needed - included for documentation)
+# pathlib - built-in
+# typing - built-in
+# os - built-in
+# sys - built-in
+# time - built-in

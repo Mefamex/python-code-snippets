@@ -1,3 +1,5 @@
+chcp 65001 >nul 2>&1
+
 :: UPDATE : python packages
 python -m pip install -U pip
 python -m pip install -U wheel setuptools PyInstaller 
