@@ -95,11 +95,11 @@ class Resize:
             corrupted_frames, successful_frames, last_good_frame = 0, 0, None
             while True:
                 frame_idx,total_frames  = int(self.clip.get(cv2.CAP_PROP_POS_FRAMES)), int(self.clip.get(cv2.CAP_PROP_FRAME_COUNT))+1
-                if frame_idx % 30 == 0 or frame_idx == total_frames:  
+                if frame_idx % 10 == 0 or frame_idx == total_frames:  
                     boyut = None
                     try: boyut = self.output_file.stat().st_size/(1024*1024)
                     except: pass
-                    print(f'\rİlerleme: {(frame_idx/total_frames)*100:.2f}% - Bozuk frame: {corrupted_frames}  |  '+ f'{boyut:.2f} MB' if boyut else "", end="", flush=True)
+                    print(f'\rİlerleme: {(frame_idx/total_frames)*100:.2f}% -  ' + (f'{boyut:.2f} MB' if boyut else "") + '  |  Bozuk frame: {corrupted_frames}', end="", flush=True )
                 ret, frame = self.clip.read()
                 if not ret: break 
                 # Frame Kontrolü
