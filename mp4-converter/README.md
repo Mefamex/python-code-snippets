@@ -555,9 +555,3 @@ Production ortamlarında kullanımdan önce test edilmesi önerilir.
 
 
 <br><br><hr>
-
-
-> **Connected:**
-><br> - [GitHub/Mefamex/python-code-snippets](https://github.com/Mefamex/python-code-snippets)
-><br> - [mefamex.com/py](https://mefamex.com/py)
-><br> - [Video Processing Tools](https://mefamex.com/tools/video)

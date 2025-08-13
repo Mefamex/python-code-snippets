@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Created on  : 2025-08-09
 # @author     : mefamex
-# FOR         : mefamex.com website depth file
+# FOR         : folder depth file
 
 print(
     "\n",
@@ -27,10 +27,17 @@ print(
     + "#" * 82 + "\n\n"
 )
 
+__version__ = '1.0.3'
+__last_modified__ = '2025-08-13'
+
 import os,time, datetime
+from pathlib import Path
+text = f'# Created for : {Path(__file__).parent.name}\n# Created on  : ' + datetime.datetime.now().isoformat(timespec='seconds') + 'Z\n'
 
-text = '# Created for : mefamex.com files\n# Created on  : ' + datetime.datetime.now().isoformat(timespec='seconds') + 'Z\n'
-
+# Hedef Uzantılar
+TARGET_EXTENSIONS = {'.txt', 'bat', '.md', '.py', '.html', 'css', '.js', 'json'}
+# starts with or ends with
+IGNORED_FOLDERS = {'.git', '__pycache__', '.venv' , 'venv'}
 
 def count_characters_in_file(file_path):
     try:
@@ -51,8 +58,8 @@ def create_table(results, grand_total_char, grand_total_files):
     
     for ext in sorted_exts:
         file_count, char_count = len(results[ext]['files']), results[ext]['total_chars']
+        if file_count == 0 and char_count == 0: continue
         table_data.append({ 'type': ext[1:].upper(), 'char': f"{char_count:,}" if char_count > 0 else "---", 'file': str(file_count) if file_count > 0 else "---" })
-    
     # Sütun genişliklerini hesapla
     type_width = max(len("TYPE"), max(len(row['type']) for row in table_data)) + 2
     char_width = max(len("CHAR"), max(len(row['char']) for row in table_data)) + 2
@@ -66,23 +73,24 @@ def create_table(results, grand_total_char, grand_total_files):
     table += "|" + "-" * type_width + "|" + "-" * char_width + "|" + "-" * file_width + "|\n"
     
     for row in table_data:
-        table += f"| {row['type']:<{type_width-1}}| {row['char']:<{char_width-1}}| {row['file']:<{file_width-1}}|\n"
-    
-    table += f"{separator}\n\nTOTAL CHARS : {grand_total_char:,} \nTOTAL FILES : {grand_total_files:,}\n\n           in mefamex.com\n"
-    
+        table += f"|{row['type']:>{type_width-1}} | {row['char']:<{char_width-1}}| {row['file']:<{file_width-1}}|\n"
+
+    table += f"{separator}\n\nTOTAL CHARS : {grand_total_char:,} \nTOTAL FILES : {grand_total_files:,}\n\n"+ f"in {Path(__file__).parent.name}".rjust(25) + "\n"
+
     return table
 
 
 
 def analyze_directory(directory):
     global text
-    target_extensions = {'.html', '.txt', '.md', '.js', '.css', '.py'}
-    ignored_folders = {'.git', '__pycache__'}
+    target_extensions = TARGET_EXTENSIONS 
+    ignored_folders = IGNORED_FOLDERS
     grand_total_char, grand_total_files = 0, 0 
     results = {ext: {'files': [], 'total_chars': 0} for ext in target_extensions}
     
     for root, _, files in os.walk(directory):
-        if any(ignored in root for ignored in ignored_folders): continue
+        for q in ignored_folders:
+            if Path(root).name.startswith(q) or Path(root).name.endswith(q):continue
         print("reading folder:", root)
         for file in files:
             _, ext = os.path.splitext(file)
