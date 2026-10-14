@@ -49,6 +49,9 @@ Her araç (script) kendi başına çalışır ve farklı sistem veya proje ihtiy
 ### [multiThread](multiThread/)
 - Verimli paralel görev yürütümü sağlamak amacıyla oluşturulmuş, thread-safe (iş parçacığı güvenli) profesyonel iş parçacığı havuzu (thread pool) implementasyonu.
 
+### [netsweep](netsweep/)
+- Yerel ağdaki canlı IP'leri sürekli keşfedip güncelleyen ve bulduğu makinelerin portlarını paralel olarak tarayan, kendi kendine yeten (standart kütüphane) ağ tarama aracı; Linux ve Windows'ta çalışır, isteğe bağlı nmap motoru destekler.
+
 ### [pip_update_install_necessary](pip_update_install_necessary/)
 - Kurulu olan tüm pip paketlerini tek seferde güncelleyen ve kurulu paket listelerini bir metin dosyasına (TXT) yedekleyen pratik güncelleme aracı.
 

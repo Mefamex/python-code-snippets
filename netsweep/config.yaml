@@ -1,0 +1,53 @@
+# =====================================================================
+#  netsweep configuration
+#  Changes take effect on the next run.
+#  CLI options override the values in this file.
+# =====================================================================
+
+# Network to scan. null => auto-detect from the connected interface.
+# Example: "10.31.85.0/24"
+network: null
+
+# Include your own IP in the scan.
+include_self: false
+
+# Safety limit: automatic scanning stops for networks larger than this.
+max_hosts: 4096
+
+# true => do a single pass and exit (instead of a continuous loop).
+single_pass: false
+
+# Colored output.
+color: true
+
+# ----- Discovery (finding live IPs) -----
+discovery:
+  interval: 5.0            # seconds between discovery passes (re-check every few seconds)
+  offline_threshold: 2     # consecutive missed rounds before a host is "offline"
+  ping_timeout: 1.0        # single ping wait time (seconds)
+  concurrency: 128         # concurrent ping workers
+  tcp_probe: true          # probe hosts that don't answer ping over TCP
+  probe_ports: [22, 80, 135, 139, 443, 445, 3389, 5900, 8080]
+
+# ----- Port scan (pure-Python engine) -----
+ports:
+  list: "20,21,22,23,25,53,69,80,88,110,111,123,135,137,138,139,143,161,389,443,445,465,514,515,548,587,631,636,873,902,993,995,1080,1194,1433,1521,1723,1883,2049,2082,2083,2181,2375,2376,3000,3128,3260,3306,3389,3478,5000,5060,5432,5672,5900,5985,5986,6000,6379,6443,7000,8000,8008,8080,8081,8088,8090,8123,8443,8888,9000,9090,9100,9200,9300,10000,11211,27017"
+  timeout: 0.7             # port connect timeout (seconds)
+  concurrency: 200         # concurrent port workers
+  banner: true             # grab banner/header from open ports
+  rescan_interval: 0.0     # re-scan hosts every N seconds (0 = once)
+
+# ----- nmap engine (if installed; more accurate) -----
+nmap:
+  enabled: true            # false => pure-Python engine
+  discovery: true          # find live hosts with nmap
+  version_detection: true  # -sV service/version detection
+  concurrency: 16          # how many nmap processes at once
+  timeout: 300             # nmap timeout per host (seconds)
+  extra_options: []        # e.g. ["--script", "http-title"]
+
+# ----- Output -----
+output:
+  directory: output
+  json: true
+  csv: true

@@ -1,0 +1,6 @@
+# Generated scan results
+output/
+
+# Python bytecode cache
+__pycache__/
+*.py[cod]
