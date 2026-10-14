@@ -17,20 +17,24 @@
 
 ## Kurulum
 
-Projeyi kullanmak için aşağıdaki adımları izleyin:
+Bu snippet, [`python-code-snippets`](https://github.com/Mefamex/python-code-snippets) reposunun içindedir. Tüm repoyu indirmeden **sadece bu klasörü** çekebilirsiniz:
 
-1. **Python Kurulumu**: Projeyi çalıştırmak için Python 3.x gereklidir.
+```bash
+git clone --depth 1 --filter=blob:none --sparse https://github.com/Mefamex/python-code-snippets.git
+cd python-code-snippets
+git sparse-checkout set image_metadata_modify
+```
 
-2. **Gerekli Kütüphanelerin Kurulumu**:
-   ```bash
-   pip install pillow piexif
-   ```
+> Klasörü GitHub'dan indirip `image_metadata_modify` içine koymanız da yeterlidir.
+>
+> Ayrıntılar (arşivle indirme, `sparse-checkout add/list/disable`, alias) için:
+> [Git ile Sadece Belirli Alt Klasörleri Klonlama](https://www.mefamex.com/blog/git-sparse-checkout-klonlama/)
 
-3. Projeyi Klonlama:
-    ```bash
-    git clone https://github.com/Mefamex/image-meta-dataset.git
-    cd image-meta-dataset
-    ```
+Projeyi çalıştırmak için Python 3.x gerekir. Gerekli kütüphaneler:
+
+```bash
+pip install pillow piexif
+```
 
 ## Kullanım
 
@@ -38,13 +42,13 @@ Projeyi kullanmak için aşağıdaki adımları izleyin:
 
 1. Meta Veri Görüntüleme:
     ```python
-    from metadata_manager import display_metadata
+    from image_metadata_modify import display_metadata
     display_metadata("path/to/your/image.jpg")
     ```
 
 2. Meta Veri Silme:
     ```python
-    from metadata_manager import delete_image_metadata
+    from image_metadata_modify import delete_image_metadata
     delete_image_metadata("path/to/your/image.jpg", "path/to/output/image.jpg")
     ```
 

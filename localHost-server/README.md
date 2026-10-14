@@ -39,7 +39,21 @@ Not: netstat parçası Windows odaklıdır; Linux/macOS için `ss` veya `lsof` a
 
 
 ## 🔧 Kurulum
-Klonlayın veya dosyayı indirin, ardından:
+
+Bu snippet, [`python-code-snippets`](https://github.com/Mefamex/python-code-snippets) reposunun içindedir. Tüm repoyu indirmeden **sadece bu klasörü** çekebilirsiniz:
+
+```bash
+git clone --depth 1 --filter=blob:none --sparse https://github.com/Mefamex/python-code-snippets.git
+cd python-code-snippets
+git sparse-checkout set localHost-server
+```
+
+> Klasörü GitHub'dan indirip `localHost-server` içine koymanız da yeterlidir.
+>
+> Ayrıntılar (arşivle indirme, `sparse-checkout add/list/disable`, alias) için:
+> [Git ile Sadece Belirli Alt Klasörleri Klonlama](https://www.mefamex.com/blog/git-sparse-checkout-klonlama/)
+
+Ardından:
 ```bash
 python main.py
 ```
